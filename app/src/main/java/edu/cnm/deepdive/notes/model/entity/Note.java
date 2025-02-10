@@ -1,5 +1,6 @@
 package edu.cnm.deepdive.notes.model.entity;
 
+import android.net.Uri;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -27,7 +28,7 @@ public class Note {
   @NonNull
   private String content = "";
 
-  private URI image;
+  private Uri image;
 
   @ColumnInfo(name = "created_on", index = true)
   @NonNull
@@ -63,11 +64,11 @@ public class Note {
     this.content = content;
   }
 
-  public URI getImage() {
+  public Uri getImage() {
     return image;
   }
 
-  public void setImage(URI image) {
+  public void setImage(Uri image) {
     this.image = image;
   }
 

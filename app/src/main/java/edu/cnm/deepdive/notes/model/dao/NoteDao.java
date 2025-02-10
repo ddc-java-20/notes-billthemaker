@@ -57,7 +57,7 @@ public interface NoteDao {
   @Query("SELECT * FROM note ORDER BY created_on DESC")
   LiveData<List<Note>> selectByCreatedOnDesc();
 
-  @Query("SELECT * FROM note WHERE created_on >= :rangeStart AND created_on < :rangeEnd BY created_on ASC")
+  @Query("SELECT * FROM note WHERE created_on >= :rangeStart AND created_on < :rangeEnd ORDER BY created_on ASC")
   LiveData<List<Note>> selectWhereCreatedOnInRangeByCreatedOnAsc(Instant rangeStart, Instant rangeEnd);
 
   @Query("SELECT * FROM note ORDER BY title ASC")
