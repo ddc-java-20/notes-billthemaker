@@ -27,7 +27,6 @@ public class Note {
   @NonNull
   private String content = "";
 
-
   private URI image;
 
   @ColumnInfo(name = "created_on", index = true)
