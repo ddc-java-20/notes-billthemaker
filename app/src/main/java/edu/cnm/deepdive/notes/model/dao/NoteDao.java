@@ -50,6 +50,9 @@ public interface NoteDao {
   @Delete
   Completable delete(Note... notes);
 
+  @Query("SELECT * FROM note WHERE note_id = :id")
+  LiveData<Note> selectById(long id);
+
   @Query("SELECT * FROM note ORDER BY created_on ASC")
   LiveData<List<Note>> selectByCreatedOnAsc();
 
