@@ -38,31 +38,19 @@ public class Note {
   @NonNull
   private Instant modifiedOn = Instant.now();
 
-  public long getId() {
-    return id;
-  }
+  public long getId() { return id; }
 
-  public void setId(long id) {
-    this.id = id;
-  }
+  public void setId(long id) {this.id = id;}
 
   @NonNull
-  public String getTitle() {
-    return title;
-  }
+  public String getTitle() { return title;  }
 
-  public void setTitle(@NonNull String title) {
-    this.title = title;
-  }
+  public void setTitle(@NonNull String title) {this.title = title;  }
 
   @NonNull
-  public String getContent() {
-    return content;
-  }
+  public String getContent() { return content;}
 
-  public void setContent(@NonNull String content) {
-    this.content = content;
-  }
+  public void setContent(@NonNull String content) {this.content = content;}
 
   public Uri getImage() {
     return image;

@@ -30,6 +30,7 @@ public abstract class NotesDatabase extends RoomDatabase {
   public synchronized static NotesDatabase getInstance() {
     return Holder.INSTANCE;
   }
+
   public abstract NoteDao getNoteDao();
 
   public static class Converters {

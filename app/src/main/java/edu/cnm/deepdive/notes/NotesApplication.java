@@ -40,5 +40,5 @@ public class NotesApplication extends Application {
         .subscribe();
 
   }
-  // TODO: 2/10/2025 add any app level initializaiton here
+
 }
