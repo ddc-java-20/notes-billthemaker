@@ -13,13 +13,13 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public class NotesRepository {
+public class NoteRepository {
 
   private final NoteDao noteDao;
   private final Scheduler scheduler;
 
   @Inject
-  NotesRepository(NoteDao noteDao) {
+  NoteRepository(NoteDao noteDao) {
     this.noteDao = noteDao;
     scheduler = Schedulers.io();
   }
@@ -43,7 +43,7 @@ public class NotesRepository {
     return noteDao.delete(note);
   }
 
-  LiveData<List<Note>> getAll() {
+  public LiveData<List<Note>> getAll() {
     return noteDao.selectByCreatedOnAsc();
   }
 

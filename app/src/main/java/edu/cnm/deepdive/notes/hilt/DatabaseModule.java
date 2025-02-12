@@ -16,6 +16,7 @@ import javax.inject.Singleton;
 public class DatabaseModule {
 
   @Provides
+  @Singleton
   NotesDatabase provideDatabase(@ApplicationContext Context context) {
     return Room.databaseBuilder(context.getApplicationContext(),
             NotesDatabase.class, NotesDatabase.getDatabaseName())
@@ -25,7 +26,7 @@ public class DatabaseModule {
 
   @Provides
   @Singleton
-  NoteDao provideNiteDao(NotesDatabase databasese) {
-    return databasese.getNoteDao();
+  NoteDao provideNoteDao(NotesDatabase database) {
+    return database.getNoteDao();
   }
 }
