@@ -30,15 +30,7 @@ public class NotesApplication extends Application {
 
   @Override
   public void onCreate() {
-
     super.onCreate();
-    NotesDatabase.setContext(this);
-    NotesDatabase.getInstance()
-        .getNoteDao()
-        .delete()
-        .subscribeOn(Schedulers.io())
-        .subscribe();
-
   }
 
 }
