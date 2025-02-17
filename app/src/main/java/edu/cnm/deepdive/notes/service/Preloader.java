@@ -1,11 +1,19 @@
 package edu.cnm.deepdive.notes.service;
 
+import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
+import com.google.gson.Gson;
+import dagger.hilt.android.qualifiers.ApplicationContext;
+import edu.cnm.deepdive.notes.R;
 import edu.cnm.deepdive.notes.model.dao.NoteDao;
 import edu.cnm.deepdive.notes.model.entity.Note;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.LinkedList;
 import java.util.List;
 import javax.inject.Inject;
@@ -13,11 +21,16 @@ import javax.inject.Provider;
 
 public class Preloader extends RoomDatabase.Callback {
 
+
+  private final Context context;
   private final Provider<NoteDao> noteDaoProvider;
+  private final Gson gson;
 
   @Inject
-  Preloader(Provider<NoteDao> noteDaoProvider) {
+  Preloader(@ApplicationContext Context context, Provider<NoteDao> noteDaoProvider, Gson gson) {
+    this.context = context;
     this.noteDaoProvider = noteDaoProvider;
+    this.gson = gson;
   }
 
   @Override
@@ -26,17 +39,20 @@ public class Preloader extends RoomDatabase.Callback {
 
     NoteDao noteDao = noteDaoProvider.get();
 
-    Note note1 = new Note();
-    note1.setTitle("Test Note 1");
-    note1.setContent("blh blah blah blah");
+    try (
+      InputStream input = context.getResources().openRawResource(R.raw.preload);
+      Reader reader = new InputStreamReader(input);
+    ) {
+      Note[] notes = gson.fromJson(reader, Note[].class);
+      noteDao
+          .insert(notes)
+          .subscribeOn(Schedulers.io())
+          .subscribe();
+    }  catch (IOException e) {
+      throw new RuntimeException(e);
+    }
 
-    Note note2 = new Note();
-    note2.setTitle("Test Note 2");
-    note2.setContent("woh wah wah wah wah");
 
-    noteDao
-        .insert(note1, note2)
-        .subscribeOn(Schedulers.io())
-        .subscribe();
+
   }
 }

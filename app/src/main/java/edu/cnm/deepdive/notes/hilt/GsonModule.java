@@ -1,6 +1,7 @@
 package edu.cnm.deepdive.notes.hilt;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import dagger.Module;
 import dagger.Provides;
 import dagger.hilt.InstallIn;
@@ -14,8 +15,10 @@ public class GsonModule {
   @Provides
   @Singleton
   Gson provideGson() {
-    // TODO: 2/17/2025 create an GsonBuilder and invoke methods to
-    //  configure it and build an instance of Gson
+    return new GsonBuilder()
+        .excludeFieldsWithoutExposeAnnotation()
+        .create();
+
 
   }
 }
