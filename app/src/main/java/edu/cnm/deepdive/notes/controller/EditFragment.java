@@ -32,6 +32,7 @@ public class EditFragment extends BottomSheetDialogFragment {
   public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     // TODO: 2025-02-18 Read any input arguments.
+    noteId = EditFragmentArgs.fromBundle(getArguments()).getNoteId();
   }
 
 
