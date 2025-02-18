@@ -27,6 +27,7 @@ public class EditFragment extends BottomSheetDialogFragment {
   private FragmentEditBinding binding;
   private NoteViewModel viewModel;
   private long noteId;
+  private Note note;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,14 +44,18 @@ public class EditFragment extends BottomSheetDialogFragment {
     return super.onCreateDialog(savedInstanceState);
   }
 
+
   @Nullable
   @Override
   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
     binding = FragmentEditBinding.inflate(inflater, container, false);
     // TODO: 2/18/2025 attach listeners to UI widgets
+    binding.cancel.setOnClickListener((v) -> dismiss());
+    binding.save.setOnClickListener((v) -> save());
     return binding.getRoot();
   }
+
 
   @Override
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -62,12 +67,14 @@ public class EditFragment extends BottomSheetDialogFragment {
           .getNote()
           .observe(getViewLifecycleOwner(), this::handleNote);
     } else {
-      // TODO: 2/18/2025 condigure UI for a new note, vs. editing an existing note
+      // TODO: 2/18/2025 configure UI for a new note, vs. editing an existing note
       binding.image.setVisibility(View.GONE);
+      note = new Note();
     }
   }
 
   private void handleNote(Note note) {
+    this.note = note;
     binding.title.setText(note.getTitle());
     binding.content.setText(note.getContent());
     Uri imageUri = note.getImage();
@@ -90,6 +97,20 @@ public class EditFragment extends BottomSheetDialogFragment {
     TypedValue typedValue = new TypedValue();
     requireContext().getTheme().resolveAttribute(colorAttr, typedValue, true);
     return typedValue.data;
+  }
+  /** @noinspection DataFlowIssue*/
+  private void save() {
+    note.setTitle(binding.title
+        .getText()
+        .toString()
+        .strip());
+    note.setContent(binding.content
+        .getText()
+        .toString()
+        .strip());
+    // TODO: 2/18/2025 set/modify the createdOn/modifiedOn
+    viewModel.save(note);
+    dismiss();
   }
 
 }
