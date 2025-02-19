@@ -22,8 +22,12 @@ public class ExplanationFragment extends DialogFragment {
         .setIcon(android.R.drawable.ic_dialog_info)
         .setMessage(R.string.camera_permission_explanation)
         .setNeutralButton(android.R.string.ok, (dialog, which) -> {
-          // TODO: 2/19/2025 Tell activity we're done
+          ((OnDismissListener) requireActivity()).onDismiss();
         })
         .create();
+  }
+
+  public interface OnDismissListener {
+    public void onDismiss();
   }
 }
