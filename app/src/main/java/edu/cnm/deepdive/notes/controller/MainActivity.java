@@ -48,7 +48,18 @@ public class MainActivity extends AppCompatActivity {
     navController = ((NavHostFragment)binding.navHostContainer.getFragment()).getNavController();
     NavigationUI.setupActionBarWithNavController(this, navController, appBarConfig);
   }
-
+  
+  private void setupPermissions() {
+    if (shouldRequestCameraPermission()) {
+      if (shouldExplainCameraPermission()) {
+        navController.navigate(HomeFragmentDirections.openExplanationFragment());
+      } else {
+        // TODO: 2/19/2025 Invoke onDismiss callback directly 
+      }
+    }   else {
+      // TODO: 2/19/2025 store result, if appropriate 
+    }
+  }
   private boolean shouldRequestCameraPermission() {
     return ContextCompat.checkSelfPermission(this, CAMERA)
         != PackageManager.PERMISSION_GRANTED;

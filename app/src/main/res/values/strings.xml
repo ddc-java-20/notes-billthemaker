@@ -12,4 +12,5 @@
   <string name="home_fragment_label">Notes</string>
   <string name="camera_permission_explanation">Granting permission to access the camera allows the
     app to attach an image to each note</string>
+  <string name="camera_permission_title">Camera Permission</string>
 </resources>

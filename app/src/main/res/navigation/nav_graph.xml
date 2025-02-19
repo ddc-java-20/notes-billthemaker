@@ -22,6 +22,10 @@
 
     </action>
 
+    <action
+      android:id="@+id/open_explanation_fragment"
+      app:destination="@id/explanation_fragment"/>
+
   </fragment>
 
   <dialog
@@ -36,6 +40,10 @@
 
 
   </dialog>
+
+  <dialog
+    android:id="@+id/explanation_fragment"
+    android:name="edu.cnm.deepdive.notes.controller.ExplanationFragment"/>
 
 
 </navigation>
