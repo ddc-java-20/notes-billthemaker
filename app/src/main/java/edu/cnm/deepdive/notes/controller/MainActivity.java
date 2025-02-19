@@ -58,5 +58,5 @@ public class MainActivity extends AppCompatActivity {
     return ActivityCompat.shouldShowRequestPermissionRationale(this, CAMERA);
   }
 
-
+  
 }
