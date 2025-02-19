@@ -1,9 +1,16 @@
 package edu.cnm.deepdive.notes.controller;
 
+import static android.Manifest.permission.CAMERA;
+
+import android.Manifest;
+import android.Manifest.permission;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -41,4 +48,15 @@ public class MainActivity extends AppCompatActivity {
     navController = ((NavHostFragment)binding.navHostContainer.getFragment()).getNavController();
     NavigationUI.setupActionBarWithNavController(this, navController, appBarConfig);
   }
+
+  private boolean shouldRequestCameraPermission() {
+    return ContextCompat.checkSelfPermission(this, CAMERA)
+        != PackageManager.PERMISSION_GRANTED;
+  }
+
+  private boolean shouldExplainCameraPermission() {
+    return ActivityCompat.shouldShowRequestPermissionRationale(this, CAMERA);
+  }
+
+
 }
