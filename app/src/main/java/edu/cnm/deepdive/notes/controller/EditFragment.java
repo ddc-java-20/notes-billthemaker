@@ -1,6 +1,8 @@
 package edu.cnm.deepdive.notes.controller;
 
+import android.Manifest.permission;
 import android.app.Dialog;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -10,6 +12,7 @@ import android.view.ViewGroup;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -53,6 +56,12 @@ public class EditFragment extends BottomSheetDialogFragment {
     // TODO: 2/18/2025 attach listeners to UI widgets
     binding.cancel.setOnClickListener((v) -> dismiss());
     binding.save.setOnClickListener((v) -> save());
+    if (ContextCompat.checkSelfPermission(requireContext(), permission.CAMERA) ==
+    PackageManager.PERMISSION_GRANTED) {
+      binding.capture.setVisibility(View.VISIBLE);
+    } else {
+      binding.capture.setVisibility(View.GONE);
+    }
     return binding.getRoot();
   }
 
