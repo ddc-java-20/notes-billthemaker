@@ -78,6 +78,10 @@ public class NoteViewModel extends ViewModel implements DefaultLifecycleObserver
     pendingCaptureUri = null;
   }
 
+  public void clearCaptureUri() {
+    captureUri.setValue(null);
+  }
+
   public LiveData<Long> getNoteId() {
     return noteId;
   }
@@ -112,5 +116,9 @@ public class NoteViewModel extends ViewModel implements DefaultLifecycleObserver
   private void postThrowable(Throwable throwable) {
     Log.e(NoteViewModel.class.getSimpleName(), throwable.getMessage(), throwable);
     this.throwable.setValue(throwable);
+  }
+
+  public void setPendingCaptureUri(Uri pendingCaptureUri) {
+    this.pendingCaptureUri = pendingCaptureUri;
   }
 }

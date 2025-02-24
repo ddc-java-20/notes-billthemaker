@@ -2,6 +2,7 @@ package edu.cnm.deepdive.notes.controller;
 
 import android.Manifest.permission;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,6 +18,8 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -26,6 +29,8 @@ import edu.cnm.deepdive.notes.databinding.FragmentEditBinding;
 import edu.cnm.deepdive.notes.model.entity.Note;
 import edu.cnm.deepdive.notes.service.ImageFileProvider;
 import edu.cnm.deepdive.notes.viewmodel.NoteViewModel;
+import java.io.File;
+import java.util.UUID;
 
 @AndroidEntryPoint
 public class EditFragment extends BottomSheetDialogFragment {
@@ -38,6 +43,7 @@ public class EditFragment extends BottomSheetDialogFragment {
   private long noteId;
   private Note note;
   private ActivityResultLauncher<Uri> captureLauncher;
+  private Uri uri;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,12 +69,8 @@ public class EditFragment extends BottomSheetDialogFragment {
     // TODO: 2/18/2025 attach listeners to UI widgets
     binding.cancel.setOnClickListener((v) -> dismiss());
     binding.save.setOnClickListener((v) -> save());
-    if (ContextCompat.checkSelfPermission(requireContext(), permission.CAMERA) ==
-    PackageManager.PERMISSION_GRANTED) {
-      binding.capture.setVisibility(View.VISIBLE);
-    } else {
-      binding.capture.setVisibility(View.GONE);
-    }
+    binding.capture.setOnClickListener((view -> capture()));
+    setCaptureVisibility();
     return binding.getRoot();
   }
 
@@ -77,25 +79,25 @@ public class EditFragment extends BottomSheetDialogFragment {
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
     viewModel = new ViewModelProvider(requireActivity()).get(NoteViewModel.class);
+    LifecycleOwner owner = getViewLifecycleOwner();
     if (noteId != 0) {
       viewModel.fetch(noteId);
       viewModel
           .getNote()
-          .observe(getViewLifecycleOwner(), this::handleNote);
+          .observe(owner, this::handleNote);
     } else {
       // TODO: 2/18/2025 configure UI for a new note, vs. editing an existing note
       binding.image.setVisibility(View.GONE);
       note = new Note();
+      uri = null;
+      viewModel.clearCaptureUri();
     }
     viewModel
         .getCaptureUri()
-        .observe(getViewLifecycleOwner(), uri -> {
-          handleCaptureUri(uri);
-        });
-    captureLauncher = registerForActivityResult(new ActivityResultContracts.TakePicture(),
-         success -> viewModel.confirmCapture(success));
+        .observe(owner, this::handleCaptureUri);
+    captureLauncher = registerForActivityResult(
+        new ActivityResultContracts.TakePicture(), viewModel::confirmCapture);
   }
-
 
   @Override
   public void onDestroyView() {
@@ -124,9 +126,9 @@ public class EditFragment extends BottomSheetDialogFragment {
   }
 
   private void setCaptureVisibility() {
-    if (ContextCompat.checkSelfPermission(requireContext(), permission.Camera) ==
+    if (ContextCompat.checkSelfPermission(requireContext(), permission.CAMERA) ==
       PackageManager.PERMISSION_GRANTED) {
-      binding.capture.setVisibility(getView().VISIBLE);
+      binding.capture.setVisibility(View.VISIBLE);
     } else {
       binding.capture.setVisibility(View.GONE);
     }
@@ -141,11 +143,17 @@ public class EditFragment extends BottomSheetDialogFragment {
 
   private void capture() {
     // TODO: 2/24/2025 using context, get reference to directory where we stored captured images
-    // TODO: 2/24/2025 ensure direcotry exists
-    // TODO: 2/24/2025 generatre randmom file name for captured image
-    // TODO: 2/24/2025 get a URI for random file using the provider infrastructure
-    // TODO: 2/24/2025 store the URI in the viewmodel
-    // TODO: 2/24/2025 launch the capture launcher.
+    Context context = requireContext();
+    File captureDir = new File(context.getFilesDir(), getString(R.string.capture_directory));
+    //noinspection ResultOfMethodCallIgnored
+    captureDir.mkdir();
+    File captureFile;
+    do {
+      captureFile = new File(captureDir, UUID.randomUUID().toString());
+    } while (captureFile.exists());
+    Uri uri = FileProvider.getUriForFile(context, AUTHORITY, captureFile);
+    viewModel.setPendingCaptureUri(uri);
+    captureLauncher.launch(uri);
   }
 
 
