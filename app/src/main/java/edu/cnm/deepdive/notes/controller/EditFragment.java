@@ -9,6 +9,10 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,17 +24,20 @@ import dagger.hilt.android.AndroidEntryPoint;
 import edu.cnm.deepdive.notes.R;
 import edu.cnm.deepdive.notes.databinding.FragmentEditBinding;
 import edu.cnm.deepdive.notes.model.entity.Note;
+import edu.cnm.deepdive.notes.service.ImageFileProvider;
 import edu.cnm.deepdive.notes.viewmodel.NoteViewModel;
 
 @AndroidEntryPoint
 public class EditFragment extends BottomSheetDialogFragment {
 
+  private static final String AUTHORITY = ImageFileProvider.class.getName().toLowerCase();
   private static final String TAG = EditFragment.class.getSimpleName();
 
   private FragmentEditBinding binding;
   private NoteViewModel viewModel;
   private long noteId;
   private Note note;
+  private ActivityResultLauncher<Uri> captureLauncher;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -80,6 +87,27 @@ public class EditFragment extends BottomSheetDialogFragment {
       binding.image.setVisibility(View.GONE);
       note = new Note();
     }
+    viewModel
+        .getCaptureUri()
+        .observe(getViewLifecycleOwner(), uri -> {
+          handleCaptureUri(uri);
+        });
+    captureLauncher = registerForActivityResult(new ActivityResultContracts.TakePicture(),
+         success -> viewModel.confirmCapture(success));
+  }
+
+
+  @Override
+  public void onDestroyView() {
+    binding = null;
+    super.onDestroyView();
+  }
+  private void handleCaptureUri(Uri uri) {
+    if (uri != null) {
+      note.setImage(uri);
+      binding.image.setImageURI(uri);
+      binding.image.setVisibility(View.VISIBLE);
+    }
   }
 
   private void handleNote(Note note) {
@@ -95,10 +123,13 @@ public class EditFragment extends BottomSheetDialogFragment {
     }
   }
 
-  @Override
-  public void onDestroyView() {
-    binding = null;
-    super.onDestroyView();
+  private void setCaptureVisibility() {
+    if (ContextCompat.checkSelfPermission(requireContext(), permission.Camera) ==
+      PackageManager.PERMISSION_GRANTED) {
+      binding.capture.setVisibility(getView().VISIBLE);
+    } else {
+      binding.capture.setVisibility(View.GONE);
+    }
   }
 
   @ColorInt
@@ -107,6 +138,20 @@ public class EditFragment extends BottomSheetDialogFragment {
     requireContext().getTheme().resolveAttribute(colorAttr, typedValue, true);
     return typedValue.data;
   }
+
+  private void capture() {
+    // TODO: 2/24/2025 using context, get reference to directory where we stored captured images
+    // TODO: 2/24/2025 ensure direcotry exists
+    // TODO: 2/24/2025 generatre randmom file name for captured image
+    // TODO: 2/24/2025 get a URI for random file using the provider infrastructure
+    // TODO: 2/24/2025 store the URI in the viewmodel
+    // TODO: 2/24/2025 launch the capture launcher.
+  }
+
+
+
+
+
   /** @noinspection DataFlowIssue*/
   private void save() {
     note.setTitle(binding.title

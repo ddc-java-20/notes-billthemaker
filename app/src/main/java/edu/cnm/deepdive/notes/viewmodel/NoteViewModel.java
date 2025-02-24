@@ -1,5 +1,6 @@
 package edu.cnm.deepdive.notes.viewmodel;
 
+import android.net.Uri;
 import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.DefaultLifecycleObserver;
@@ -21,14 +22,18 @@ public class NoteViewModel extends ViewModel implements DefaultLifecycleObserver
   private final NoteRepository noteRepository;
   private final MutableLiveData<Long> noteId;
   private final LiveData<Note> note;
+  private final MutableLiveData<Uri> captureUri;
   private final MutableLiveData<Throwable> throwable;
   private final CompositeDisposable pending;
+
+  private Uri pendingCaptureUri;
 
   @Inject
   NoteViewModel(NoteRepository noteRepository) {
     this.noteRepository = noteRepository;
     noteId = new MutableLiveData<>();
     note = Transformations.switchMap(noteId, noteRepository::get);
+    captureUri = new MutableLiveData<>();
     throwable = new MutableLiveData<>();
     pending = new CompositeDisposable();
   }
@@ -68,7 +73,12 @@ public class NoteViewModel extends ViewModel implements DefaultLifecycleObserver
         );
   }
 
-  public MutableLiveData<Long> getNoteId() {
+  public void confirmCapture(boolean success) {
+    captureUri.setValue(success ? pendingCaptureUri : null);
+    pendingCaptureUri = null;
+  }
+
+  public LiveData<Long> getNoteId() {
     return noteId;
   }
 
@@ -77,10 +87,20 @@ public class NoteViewModel extends ViewModel implements DefaultLifecycleObserver
   }
 
   public LiveData<List<Note>> getNotes() {
+
     return noteRepository.getAll();
   }
-  public MutableLiveData<Throwable> getThrowable() {
+
+  public LiveData<Uri> getCaptureUri() {
+    return captureUri;
+  }
+
+  public LiveData<Throwable> getThrowable() {
     return throwable;
+  }
+
+  public void getPendingCaptureUri(Uri pendingCaptureUri) {
+    this.pendingCaptureUri = pendingCaptureUri;
   }
 
   @Override
