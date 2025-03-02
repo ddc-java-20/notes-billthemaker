@@ -10,10 +10,16 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.material.snackbar.Snackbar;
+import edu.cnm.deepdive.notes.R;
 import edu.cnm.deepdive.notes.databinding.FragmentLoginBinding;
 import edu.cnm.deepdive.notes.viewmodel.LoginViewModel;
 
+/** @noinspection deprecation*/
 public class LoginFragment extends Fragment {
 
   private FragmentLoginBinding binding;
@@ -35,21 +41,30 @@ public class LoginFragment extends Fragment {
 
     viewModel = new ViewModelProvider(requireActivity())
         .get(LoginViewModel.class);
+    LifecycleOwner owner = getViewLifecycleOwner();
     viewModel
         .getAccount()
-        .observe(getViewLifecycleOwner(), account -> {
-          // TODO: 2/27/2025 navigate to home fragment
-        });
+        .observe(owner, this::handleAccount);
     viewModel
         .getSignInThrowable()
-        .observe(getViewLifecycleOwner(), throwable -> {
-          if (throwable != null) {
-            // TODO: 2/27/2025 show snackbar with signin failure
-          }
-        });
+        .observe(owner, this::handleThrowable);
 
     launcher = registerForActivityResult(new StartActivityForResult(),
         (result) -> viewModel.completeSignIn(result));
+  }
+
+  private void handleThrowable(Throwable throwable) {
+    if (throwable != null) {
+      Snackbar.make(binding.getRoot(), R.string.sign_in_failure_message, Snackbar.LENGTH_LONG)
+          .show();
+    }
+  }
+
+  private void handleAccount(GoogleSignInAccount account) {
+    if (account != null) {
+      Navigation.findNavController(binding.getRoot())
+          .navigate(LoginFragmentDirections.navigateToHomeFragment());
+    }
   }
 
   @Override
